@@ -1,0 +1,82 @@
+node_namespace:
+  example_node_1:
+    ros__parameters:
+      front:
+        enabled: true
+        exposure_time: 90000.0
+        frame_rate: 10.0
+        index: 0
+        monochrome: false
+        path: ""
+        reset: false
+        save_data: false
+      rear:
+        enabled: true
+        exposure_time: 90000.0
+        frame_rate: 10.0
+        index: 1
+        monochrome: false
+        path: ""
+        reset: false
+        saveData: false
+      roi:
+        enabled: false
+        height: 612
+        width: 1024
+        x: 0
+        y: 0
+
+  example_node_2:
+    ros__parameters:
+      ColorMap: True
+      Subscribers:
+        Camera_4k:
+          frame_rate: 10.0
+        Camera_720p:
+          frame_rate: 24.0
+      Indexes:
+        CVI: True
+        Red: False
+        Green: False
+        NIR: False
+        Normalized_Green: False
+        Normalized_NIR: False
+        Normalized_Red: False
+        TVI: True
+
+  example_node_3:
+    ros__parameters:
+      image_width: 3840
+      image_height: 2160
+      camera_name: camera_1
+      camera_matrix:
+        rows: 3
+        cols: 3
+        data: [23.807, 0., 127.32, 0., 220.2, 9.2, 0., 0., 1.]
+      distortion_model: plumb_bob
+      distortion_coefficients:
+        rows: 1
+        cols: 5
+        data: [-0.0123, 0.0321, -0.0155, 0.0115, 0.000000]
+      rectification_matrix:
+        rows: 3
+        cols: 3
+        data: [1., 0., 0., 0., 1., 0., 0., 0., 1.]
+      projection_matrix:
+        rows: 3
+        cols: 4
+        data:
+          [
+            1176.22803,
+            0.,
+            1275.90659,
+            0.,
+            0.,
+            2273.07715,
+            441.91894,
+            0.,
+            0.,
+            0.,
+            1.,
+            0.,
+          ]

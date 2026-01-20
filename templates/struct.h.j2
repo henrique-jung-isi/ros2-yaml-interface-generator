@@ -1,0 +1,5 @@
+struct {{ data.name }} {
+{% for field in data.fields %}
+{{ field.type }} {{ field.name }};
+{% endfor %}
+};
