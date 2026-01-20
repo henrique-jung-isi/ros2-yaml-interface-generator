@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "eamodio.gitlens",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.cpptools-extension-pack",
+    "samuelcolvin.jinjahtml",
+    "ms-python.python",
+    "esbenp.prettier-vscode",
+    "ms-python.black-formatter",
+  ]
+}
