@@ -2,13 +2,23 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 import subprocess
 
-pythonToCpp = {
+typeToCpp = {
     str: "std::string",
     int: "int",
     bool: "bool",
     float: "double",
     list: "//TODO: type(list)",
 }
+
+header = """//GENERATED FILE DO NOT EDIT BY HAND!
+
+#pragma once
+    
+#include "rclcpp/rclcpp.hpp"
+#include <string>
+
+
+"""
 
 
 def generate(partialConfig: dict, name: str | None = None) -> str:
@@ -18,13 +28,11 @@ def generate(partialConfig: dict, name: str | None = None) -> str:
         if isinstance(value, dict):
             structs.append(generate(value, key))
         else:
-            fields.append({"type": pythonToCpp[type(value)], "name": key})
+            fields.append({"type": typeToCpp[type(value)], "name": key})
     renderedStructs = ""
     rendered = ""
     if fields:
-        renderedStructs = structTemplate.render(
-            data={"name": name, "fields": fields}
-        )
+        renderedStructs = structTemplate.render(data={"name": name, "fields": fields})
         rendered = renderedStructs
     if structs:
         rendered = namespaceTemplate.render(
@@ -33,18 +41,18 @@ def generate(partialConfig: dict, name: str | None = None) -> str:
     return rendered
 
 
-def saveHeader(header: str, name: str):
+def save(source: str, name: str):
     with open(f"examples/{name}.hpp", "w") as file:
-        file.write(header)
+        file.write(header + source)
 
 
 def iterate(partialConfig: dict, spacer: int = 0, prevKey: str | None = None):
     for key, value in partialConfig.items():
         if isinstance(value, dict):
             if key == "ros__parameters":
-                header = generate(value, prevKey)
+                source = generate(value, prevKey)
                 if prevKey is not None:
-                    saveHeader(header, prevKey)
+                    save(source, prevKey)
                 else:
                     raise Exception("Previous key was None")
             else:
@@ -63,4 +71,4 @@ structTemplate = env.get_template("struct.h.j2")
 namespaceTemplate = env.get_template("namespace.h.j2")
 config = dict(data)
 iterate(config)
-subprocess.run("clang-format -i $(ls examples/*.hpp)",shell=True,executable="bash")
+subprocess.run("clang-format -i $(ls examples/*.hpp)", shell=True, executable="bash")

@@ -1,5 +1,12 @@
 struct {{ data.name }} {
-{% for field in data.fields %}
-{{ field.type }} {{ field.name }};
-{% endfor %}
+    {{ data.name }}() = default;
+    {{ data.name }}(rclcpp::Node *node){
+        {% for field in data.fields %}
+            node->get_parameter("{{ data.name }}.{{ field.name }}", {{ field.name }});
+        {% endfor %}
+    }
+    
+    {% for field in data.fields %}
+    {{ field.type }} {{ field.name }};
+    {% endfor %}
 };
