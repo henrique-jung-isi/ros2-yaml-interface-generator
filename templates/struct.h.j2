@@ -5,6 +5,14 @@ struct {{ data.name }} {
             node->get_parameter("{{ data.name }}.{{ field.name }}", {{ field.name }});
         {% endfor %}
     }
+
+    std::string toString() const{
+        std::stringstream ss;
+        {% for field in data.fields %}
+            ss << "{{ data.name }}.{{ field.name }}: " << {{ field.name }} << std::endl;
+        {% endfor %}
+        return ss.str();
+    }
     
     {% for field in data.fields %}
     {{ field.type }} {{ field.name }};
