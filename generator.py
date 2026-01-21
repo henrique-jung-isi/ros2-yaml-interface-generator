@@ -14,9 +14,9 @@ header = """//GENERATED FILE DO NOT EDIT BY HAND!
 
 #pragma once
     
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
 #include <string>
-
+#include <sstream>
 
 """
 
@@ -32,7 +32,9 @@ def generate(partialConfig: dict, name: str | None = None) -> str:
     renderedStructs = ""
     rendered = ""
     if fields:
-        renderedStructs = structTemplate.render(data={"name": name, "fields": fields})
+        renderedStructs = structTemplate.render(
+            data={"name": name, "fields": fields}
+        )
         rendered = renderedStructs
     if structs:
         rendered = namespaceTemplate.render(
@@ -62,7 +64,7 @@ def iterate(partialConfig: dict, spacer: int = 0, prevKey: str | None = None):
             print(" " * spacer + f"{key}: {value}")
 
 
-with open("examples/config.yaml", "r") as file:
+with open("examples/src/ros_example/config/config.yaml", "r") as file:
     data = yaml.safe_load(file)
 env = Environment(
     loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True
@@ -71,4 +73,6 @@ structTemplate = env.get_template("struct.h.j2")
 namespaceTemplate = env.get_template("namespace.h.j2")
 config = dict(data)
 iterate(config)
-subprocess.run("clang-format -i $(ls examples/*.hpp)", shell=True, executable="bash")
+subprocess.run(
+    "clang-format -i $(ls examples/*.hpp)", shell=True, executable="bash"
+)
