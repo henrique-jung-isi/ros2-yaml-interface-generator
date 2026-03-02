@@ -1,0 +1,9 @@
+  struct {
+    {% for field in data.fields %}
+      {{ field.type }} {{ field.name }};
+    {% endfor %}
+    {% for struct in data.structs %}
+
+      {{struct}}
+    {% endfor %}
+  } {{ data.name }};

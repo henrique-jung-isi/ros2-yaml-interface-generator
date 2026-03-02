@@ -21,26 +21,34 @@ header = """//GENERATED FILE DO NOT EDIT BY HAND!
 """
 
 
-def generate(partialConfig: dict, name: str | None = None) -> str:
+# TODO: transform partialConfig snake case to camel case
+def generate(
+    partialConfig: dict, name: str, accumulatedName: str | None = None
+) -> tuple[str, list]:
     structs = []
     fields = []
+    initializations = []
     for key, value in partialConfig.items():
+        acc = key if accumulatedName is None else accumulatedName + "." + key
         if isinstance(value, dict):
-            structs.append(generate(value, key))
+            [generated, inner] = generate(value, key, acc)
+            structs.append(generated)
+            initializations += inner
         else:
             fields.append({"type": typeToCpp[type(value)], "name": key})
-    renderedStructs = ""
-    rendered = ""
-    if fields:
-        renderedStructs = structTemplate.render(
-            data={"name": name, "fields": fields}
-        )
-        rendered = renderedStructs
-    if structs:
-        rendered = namespaceTemplate.render(
-            data={"name": name, "fields": structs + [renderedStructs]}
-        )
-    return rendered
+            initializations.append({"attributeName": acc, "parameterName": acc})
+
+    template = namespaceTemplate if accumulatedName is None else innerStructTemplate
+    rendered = template.render(
+        data={
+            "name": name,
+            "fields": fields,
+            "structs": structs,
+            "initializations": initializations,
+        }
+    )
+
+    return (rendered, initializations)
 
 
 def save(source: str, name: str):
@@ -51,12 +59,9 @@ def save(source: str, name: str):
 def iterate(partialConfig: dict, spacer: int = 0, prevKey: str | None = None):
     for key, value in partialConfig.items():
         if isinstance(value, dict):
-            if key == "ros__parameters":
-                source = generate(value, prevKey)
-                if prevKey is not None:
-                    save(source, prevKey)
-                else:
-                    raise Exception("Previous key was None")
+            if key == "ros__parameters" and prevKey is not None:
+                [source, _] = generate(value, prevKey)
+                save(source, prevKey)
             else:
                 print(" " * spacer + f"{key}:")
                 iterate(value, spacer + 2, key)
@@ -69,10 +74,8 @@ with open("examples/src/ros_example/config/config.yaml", "r") as file:
 env = Environment(
     loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True
 )
-structTemplate = env.get_template("struct.h.j2")
+innerStructTemplate = env.get_template("inner-struct.h.j2")
 namespaceTemplate = env.get_template("namespace.h.j2")
 config = dict(data)
 iterate(config)
-subprocess.run(
-    "clang-format -i $(ls examples/*.hpp)", shell=True, executable="bash"
-)
+subprocess.run("clang-format -i $(ls examples/*.hpp)", shell=True, executable="bash")

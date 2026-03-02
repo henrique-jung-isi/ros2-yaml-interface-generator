@@ -1,7 +1,30 @@
-namespace {{ data.name }} {
+namespace YamlConfig {
+struct {{ data.name }} {
+  {{ data.name }}() = default;
+  {{ data.name }}(rclcpp::Node *node){
+    {% for init in data.initializations %}
+        node->get_parameter("{{ init.attributeName }}", {{ init.parameterName }});
+    {% endfor %}
+  }
+  {% if data.fields %}
 
-{% for field in data.fields %}
-{{ field }}
+  {% endif %}
+  {% for field in data.fields %}
+    {{ field.type }} {{ field.name }};
+  {% endfor %}
+  {% for struct in data.structs %}
 
-{% endfor %}
+    {{struct}}
+  {% endfor %}
+
+  std::string toString() const {
+    std::stringstream ss;
+    ss << "{{ data.name }}(";
+    {% for init in data.initializations %}
+        ss << "{{ init.parameterName }}: " << {{ init.parameterName }} {% if init != data.initializations[-1] %}  << ", " {% endif %};
+    {% endfor %}
+    ss << ")";
+    return ss.str();
+  }
+};
 };
