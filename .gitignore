@@ -208,3 +208,5 @@ __marimo__/
 
 *.h
 *.hpp
+.vscode/browse.vc*
+.vscode/c_cpp_properties.json
