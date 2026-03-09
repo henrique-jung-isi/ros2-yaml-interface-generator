@@ -7,7 +7,7 @@ public:
       : rclcpp::Node(
             name, rclcpp::NodeOptions()
                       .automatically_declare_parameters_from_overrides(true)),
-        _frontConfig{this} {
+        _config{this} {
     auto parameters_list =
         this->list_parameters({}, 10); // 10 is config deep level
 
@@ -17,14 +17,14 @@ public:
       auto param = this->get_parameter(name);
       ss << "[" << name << "] = " << param << std::endl;
     }
-    RCLCPP_INFO(this->get_logger(), "From get_parameter: \n%s",
-                ss.str().c_str());
-    RCLCPP_INFO(this->get_logger(), "From generator: \n%s",
-                _frontConfig.toString().c_str());
+    RCLCPP_INFO(
+        this->get_logger(), "From get_parameter: \n%s", ss.str().c_str());
+    RCLCPP_INFO(
+        this->get_logger(), "From generator: \n%s", _config.toString().c_str());
   }
 
 private:
-  ros_example_node::front _frontConfig;
+  YamlConfig::ros_example_node _config;
 };
 
 int main(int argc, char *argv[]) {
