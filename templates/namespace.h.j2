@@ -3,7 +3,11 @@ struct {{ data.name }} {
   {{ data.name }}() = default;
   {{ data.name }}(rclcpp::Node *node){
     {% for init in data.initializations %}
-        node->get_parameter("{{ init.attributeName }}", {{ init.parameterName }});
+        {% if init.structName %}
+            node->get_parameter("{{ init.attributeName }}", {{ init.structName }}.{{ init.fieldName }});
+        {% else %}
+            node->get_parameter("{{ init.attributeName }}", {{ init.fieldName }});
+        {% endif %}
     {% endfor %}
   }
   {% if data.fields %}
@@ -21,7 +25,11 @@ struct {{ data.name }} {
     std::stringstream ss;
     ss << "{{ data.name }}(";
     {% for init in data.initializations %}
-        ss << "{{ init.parameterName }}: " << {{ init.parameterName }} {% if init != data.initializations[-1] %}  << ", " {% endif %};
+        {% if init.structName %}
+            ss << "{{ init.parameterName }}: " << {{ init.structName }}.{{ init.fieldName }} {% if init != data.initializations[-1] %}  << ", " {% endif %};
+        {% else %}
+            ss << "{{ init.parameterName }}: " << {{ init.fieldName }} {% if init != data.initializations[-1] %}  << ", " {% endif %};
+        {% endif %}
     {% endfor %}
     ss << ")";
     return ss.str();
